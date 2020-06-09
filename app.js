@@ -13,21 +13,23 @@ const formatQueryParams = function(params) {
 
 const displayResults = function(responseJson) {
   // if there are previous results, remove them
-  console.log(responseJson);
+  // console.log(responseJson);
   $('#results-list').empty();
   // iterate thru the items array
-  for (let i = 0; i < responseJson.items.length; i++) {
+  for (let i = 0; i < responseJson.data.length; i++) {
+    let park = responseJson.data[i];
     // for each park object in the items
     // array, add a list item to the results
     // list with fullName, description, url
-    $('#results-list').append(
-      `<li><h3>${responseJson.data[i].fullName}</h3>
-      <p>${responseJson.data[i].description}</p>
-      <p>${responseJson.data[i].url}</p>
-      </li>`
-    )};
-  // display the results section
-  $('#results').removeClass('hidden');
+    $('#results-list').append(` 
+      <li><h3>${park.name}</h3>
+      <p>${park.description}</p>
+      <p><a href="${park.url}">${park.url}</a></p>
+      </li> 
+      `);
+    // display the results section
+    $('#results').removeClass('hidden');
+  }
 };
 
 
@@ -36,16 +38,16 @@ const displayResults = function(responseJson) {
 
 const getParkData = function(query, maxResults=10) {
   const params = {
-    fullName,
-    description,
-    url,
-    maxResults
+    api_Key: apiKey,
+    limit: maxResults,
+    stateCode: query,
   };
+  
   const queryString = formatQueryParams(params);
   const url = searchURL + '?' + queryString;
 
 
-  console.log(url);
+  // console.log(url);
 
   // fetch url
   fetch(url)
@@ -59,7 +61,7 @@ const getParkData = function(query, maxResults=10) {
     .catch(error => {
       $('#js-error-message').text('Oops something went wrong: ${error.message}');
     });
-}
+};
 
 
 
@@ -67,9 +69,10 @@ const getParkData = function(query, maxResults=10) {
 const watchForm = function() {
   $('form').submit(event => {
     event.preventDefault();
-    const searchTerms = $('.search-term').val();
-    const maxResults = $('.display-count').val();
+    const state = $('#js-search-term').val();
+    const maxResults = $('#js-max-results').val();
     // function to get search results with params
+    getParkData(state, maxResults);
   });
 };
 
